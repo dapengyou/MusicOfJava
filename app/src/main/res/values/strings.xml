@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MusicOfJava</string>
+    <string name="menu_change_skin">个性换肤</string>
+    <string name="menu_timer">定时停止播放</string>
+    <string name="menu_scan">扫一扫</string>
+    <string name="menu_driver">驾驶模式</string>
+    <string name="menu_exit">退出</string>
+    <string name="local_music">本地音乐</string>
+    <string name="line_music">线上音乐</string>
+</resources>

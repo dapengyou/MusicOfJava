@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/action_change"
+            android:title="@string/menu_change_skin" />
+        <item
+            android:id="@+id/action_scan"
+            android:title="@string/menu_scan" />
+        <item
+            android:id="@+id/action_timer"
+            android:title="@string/menu_timer" />
+        <item
+            android:id="@+id/action_driver"
+            android:title="@string/menu_driver" />
+        <item
+            android:id="@+id/action_exit"
+            android:title="@string/menu_exit" />
+    </group>
+</menu>
