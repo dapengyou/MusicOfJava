@@ -14,6 +14,7 @@ import com.test.musicofjava.dataSave.SharedPreferencesManager;
 import com.test.musicofjava.enums.PlayModeEnum;
 import com.test.musicofjava.fragment.AlbumFragment;
 import com.test.musicofjava.fragment.LrcViewFragment;
+import com.test.musicofjava.widget.AlbumCoverView;
 
 public class PlayActivity extends BaseActivity {
     private ImageView mIvBack;
@@ -30,6 +31,8 @@ public class PlayActivity extends BaseActivity {
     private LrcViewFragment mLrcViewFragment;
     private AlbumFragment mAlbumFragment;
     private boolean isShowLrc = false;
+    private AlbumCoverView mAlbumCoverView;
+    private boolean isPlay = false;//是否播放
 
 
     @Override
@@ -54,8 +57,9 @@ public class PlayActivity extends BaseActivity {
 
         //封面、歌词
         mFrameLayout = findViewById(R.id.frameLayout);
-//        mFrontAlbum = findViewById(R.id.ll_front_album);
-//        mBackLrc = findViewById(R.id.ll_back_lrc);
+        mFrontAlbum = findViewById(R.id.ll_front_album);
+        mBackLrc = findViewById(R.id.ll_back_lrc);
+        mAlbumCoverView = findViewById(R.id.albumCoverView);
 
     }
 
@@ -63,6 +67,13 @@ public class PlayActivity extends BaseActivity {
     protected void initData(Intent intent, Bundle savedInstanceState) {
         initPlayMode();
         flipCard();
+
+        mAlbumCoverView.initNeedle(isPlay);
+//        if (isPlay) {
+//            mAlbumCoverView.start();
+//        } else {
+//            mAlbumCoverView.pause();
+//        }
     }
 
     @Override
@@ -80,6 +91,15 @@ public class PlayActivity extends BaseActivity {
     protected void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.iv_play:
+                if (isPlay) {
+                    mIvPlay.setSelected(false);
+                    isPlay = false;
+                    mAlbumCoverView.pause();
+                } else {
+                    mIvPlay.setSelected(true);
+                    isPlay = true;
+                    mAlbumCoverView.start();
+                }
                 break;
             case R.id.iv_next:
                 break;
@@ -104,23 +124,30 @@ public class PlayActivity extends BaseActivity {
 
     //切换歌词与封面
     private void flipCard() {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        if (isShowLrc) {
+//            if (mLrcViewFragment == null) {
+//                mLrcViewFragment = new LrcViewFragment();
+//                fragmentTransaction.replace(R.id.frameLayout, mLrcViewFragment);
+//            } else {
+//                fragmentTransaction.replace(R.id.frameLayout, mLrcViewFragment);
+//            }
+//        } else {
+//            if (mAlbumFragment == null) {
+//                mAlbumFragment = new AlbumFragment();
+//                fragmentTransaction.replace(R.id.frameLayout, mAlbumFragment);
+//            } else {
+//                fragmentTransaction.replace(R.id.frameLayout, mAlbumFragment);
+//            }
+//        }
+//        fragmentTransaction.commitAllowingStateLoss();
         if (isShowLrc) {
-            if (mLrcViewFragment == null) {
-                mLrcViewFragment = new LrcViewFragment();
-                fragmentTransaction.replace(R.id.frameLayout, mLrcViewFragment);
-            } else {
-                fragmentTransaction.replace(R.id.frameLayout, mLrcViewFragment);
-            }
+            mBackLrc.setVisibility(View.VISIBLE);
+            mFrontAlbum.setVisibility(View.GONE);
         } else {
-            if (mAlbumFragment == null) {
-                mAlbumFragment = new AlbumFragment();
-                fragmentTransaction.replace(R.id.frameLayout, mAlbumFragment);
-            } else {
-                fragmentTransaction.replace(R.id.frameLayout, mAlbumFragment);
-            }
+            mBackLrc.setVisibility(View.GONE);
+            mFrontAlbum.setVisibility(View.VISIBLE);
         }
-        fragmentTransaction.commitAllowingStateLoss();
 
     }
 

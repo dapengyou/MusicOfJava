@@ -5,13 +5,15 @@
     <color name="colorAccent">#FF4081</color>
 
 
-    <color name="white_50p">#80FFFFFF</color>
+    <color name="white_8p">#14FFFFFF</color>
+    <color name="white_16p">#29FFFFFF</color>
     <color name="white_24p">#3DFFFFFF</color>
+    <color name="white_50p">#80FFFFFF</color>
+    <color name="white_96p">#F5FFFFFF</color>
     <color name="white">@android:color/white</color>
     <color name="grey">#9E9E9E</color>
 
     <color name="red">#4CF44336</color>
-
 
 
 </resources>

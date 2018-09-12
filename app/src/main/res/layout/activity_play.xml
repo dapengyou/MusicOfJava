@@ -66,9 +66,9 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <!--<include layout="@layout/layout_album_cover" />-->
+            <include layout="@layout/layout_album_cover" />
 
-            <!--<include layout="@layout/layout_lrc_view" />-->
+            <include layout="@layout/layout_lrc_view" />
 
         </FrameLayout>
 

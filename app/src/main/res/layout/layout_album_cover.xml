@@ -3,11 +3,11 @@
     android:id="@+id/ll_front_album"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="gone"
     android:orientation="vertical">
 
-    <TextView
+    <com.test.musicofjava.widget.AlbumCoverView
+        android:id="@+id/albumCoverView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="封面" />
+        android:layout_height="match_parent" />
 </LinearLayout>
