@@ -7,9 +7,10 @@ import android.view.View;
 
 import com.test.baselibrary.base.BaseActivity;
 import com.test.baselibrary.base.BaseFragment;
+import com.test.musicofjava.MyBaseActivity;
 import com.test.musicofjava.R;
 
-public class SearchActivity extends BaseActivity {
+public class SearchActivity extends MyBaseActivity {
 
     @Override
     protected int getLayoutId() {

@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.test.musicofjava">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -18,8 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SearchActivity"></activity>
-        <activity android:name=".activity.PlayActivity"></activity>
+        <activity android:name=".activity.SearchActivity" />
+        <activity android:name=".activity.PlayActivity" />
+
+        <service android:name=".service.PlayService" />
+
+        <activity android:name=".activity.MusicListActivity"></activity>
     </application>
 
 </manifest>

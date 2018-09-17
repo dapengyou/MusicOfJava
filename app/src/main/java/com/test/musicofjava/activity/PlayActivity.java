@@ -8,22 +8,32 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.test.baselibrary.Utils.DateUtils;
 import com.test.baselibrary.base.BaseActivity;
+import com.test.baselibrary.bean.Music;
+import com.test.musicofjava.MyBaseActivity;
 import com.test.musicofjava.R;
 import com.test.musicofjava.dataSave.SharedPreferencesManager;
 import com.test.musicofjava.enums.PlayModeEnum;
 import com.test.musicofjava.fragment.AlbumFragment;
 import com.test.musicofjava.fragment.LrcViewFragment;
+import com.test.musicofjava.service.AudioPlayer;
+import com.test.musicofjava.service.OnPlayerEventListener;
 import com.test.musicofjava.widget.AlbumCoverView;
 
-public class PlayActivity extends BaseActivity {
+public class PlayActivity extends MyBaseActivity implements OnPlayerEventListener {
     private ImageView mIvBack;
     private ImageView mIvNext, mIvPlay, mIvPrev, mIvMode;
 
     private TextView mTvCurrentTime;//当前播放的时间
     private TextView mTvTotalTime;//歌曲总时间
 
+    private TextView mTvTitle;
+    private TextView mTvArtist;
+
     private SeekBar mSeekBar;
+    private int mLastProgress;
+
 
     private View mFrontAlbum;//专辑封面
     private View mBackLrc;//歌词
@@ -61,6 +71,9 @@ public class PlayActivity extends BaseActivity {
         mBackLrc = findViewById(R.id.ll_back_lrc);
         mAlbumCoverView = findViewById(R.id.albumCoverView);
 
+        mTvTitle = findViewById(R.id.tv_title);
+        mTvArtist = findViewById(R.id.tv_artist);
+
     }
 
     @Override
@@ -68,12 +81,32 @@ public class PlayActivity extends BaseActivity {
         initPlayMode();
         flipCard();
 
-        mAlbumCoverView.initNeedle(isPlay);
-//        if (isPlay) {
-//            mAlbumCoverView.start();
-//        } else {
-//            mAlbumCoverView.pause();
-//        }
+        onChangeImpl(AudioPlayer.getInstance().getPlayMusic());
+        AudioPlayer.getInstance().addOnPlayEventListener(this);
+    }
+
+    private void onChangeImpl(Music music) {
+        if (music == null) {
+            return;
+        }
+
+        mTvTitle.setText(music.getTitle());
+        mTvArtist.setText(music.getArtist());
+        mSeekBar.setProgress((int) AudioPlayer.getInstance().getAudioPosition());
+        mSeekBar.setSecondaryProgress(0);
+        mSeekBar.setMax((int) music.getDuration());
+        mLastProgress = 0;
+        mTvCurrentTime.setText("00:00");
+        mTvTotalTime.setText(DateUtils.format("mm:ss", music.getDuration()));
+//        setCoverAndBg(music);
+//        setLrc(music);
+        if (AudioPlayer.getInstance().isPlaying() || AudioPlayer.getInstance().isPreparing()) {
+            mIvPlay.setSelected(true);
+            mAlbumCoverView.start();
+        } else {
+            mIvPlay.setSelected(false);
+            mAlbumCoverView.pause();
+        }
     }
 
     @Override
@@ -91,15 +124,7 @@ public class PlayActivity extends BaseActivity {
     protected void onViewClick(View v) {
         switch (v.getId()) {
             case R.id.iv_play:
-                if (isPlay) {
-                    mIvPlay.setSelected(false);
-                    isPlay = false;
-                    mAlbumCoverView.pause();
-                } else {
-                    mIvPlay.setSelected(true);
-                    isPlay = true;
-                    mAlbumCoverView.start();
-                }
+                AudioPlayer.getInstance().playPause();
                 break;
             case R.id.iv_next:
                 break;
@@ -124,23 +149,7 @@ public class PlayActivity extends BaseActivity {
 
     //切换歌词与封面
     private void flipCard() {
-//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//        if (isShowLrc) {
-//            if (mLrcViewFragment == null) {
-//                mLrcViewFragment = new LrcViewFragment();
-//                fragmentTransaction.replace(R.id.frameLayout, mLrcViewFragment);
-//            } else {
-//                fragmentTransaction.replace(R.id.frameLayout, mLrcViewFragment);
-//            }
-//        } else {
-//            if (mAlbumFragment == null) {
-//                mAlbumFragment = new AlbumFragment();
-//                fragmentTransaction.replace(R.id.frameLayout, mAlbumFragment);
-//            } else {
-//                fragmentTransaction.replace(R.id.frameLayout, mAlbumFragment);
-//            }
-//        }
-//        fragmentTransaction.commitAllowingStateLoss();
+
         if (isShowLrc) {
             mBackLrc.setVisibility(View.VISIBLE);
             mFrontAlbum.setVisibility(View.GONE);
@@ -190,4 +199,30 @@ public class PlayActivity extends BaseActivity {
         super.onBackPressed();
         this.overridePendingTransition(0, R.anim.anim_bottom_out);
     }
+
+    @Override
+    public void onChangeMusic(Music music) {
+
+    }
+
+    @Override
+    public void onPlayerStart() {
+        mIvPlay.setSelected(true);
+    }
+
+    @Override
+    public void onPlayerPause() {
+        mIvPlay.setSelected(false);
+    }
+
+    @Override
+    public void onPublish(int progress) {
+        mSeekBar.setProgress(progress);
+    }
+
+    @Override
+    public void onBufferingUpdate(int percent) {
+
+    }
+
 }

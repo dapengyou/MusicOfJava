@@ -7,7 +7,9 @@ import com.test.musicofjava.MyApplication;
 
 public class SharedPreferencesManager {
     private static final String SHARE_PREFERENCE_NAME = "sharedPreference.pre";//文件名
-    private static final String PLAY_MODE = "play_mode";
+    private static final String PLAY_MODE = "play_mode";//播放模式
+    private static final String PLAY_POSITION = "play_position";//播放位置
+
     private static SharedPreferencesManager sInstance;
     private static SharedPreferences sSharedPreferences;
     private static SharedPreferences.Editor sEditor;
@@ -44,6 +46,24 @@ public class SharedPreferencesManager {
      */
     public void savePlayMode(int value) {
         setInt(PLAY_MODE, value);
+    }
+
+    /**
+     * 获得播放位置
+     *
+     * @return
+     */
+    public int getPlayPosition() {
+        return getInt(PLAY_POSITION, 0);
+    }
+
+    /**
+     * 存储播放位置
+     *
+     * @param value 位置
+     */
+    public void savePlayPosition(int value) {
+        setInt(PLAY_POSITION, value);
     }
 
     private void setInt(String key, int value) {

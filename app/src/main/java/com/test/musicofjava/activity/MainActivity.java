@@ -1,24 +1,32 @@
 package com.test.musicofjava.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.test.baselibrary.base.BaseActivity;
+import com.test.baselibrary.bean.Music;
+import com.test.musicofjava.MyBaseActivity;
 import com.test.musicofjava.R;
 import com.test.musicofjava.adapter.FragmentAdapter;
+import com.test.musicofjava.extra.ControlPanel;
 import com.test.musicofjava.fragment.LineMusicFragment;
 import com.test.musicofjava.fragment.LocalMusicFragment;
+import com.test.musicofjava.service.AudioPlayer;
+import com.test.musicofjava.service.OnPlayerEventListener;
 
-public class MainActivity extends BaseActivity implements ViewPager.OnPageChangeListener {
+public class MainActivity extends MyBaseActivity implements ViewPager.OnPageChangeListener, OnPlayerEventListener {
     private ImageView mIvSeach;//搜索
     private ImageView mIvMenu;//抽屉菜单
     private TextView mTvLocalMusic;//本地音乐
@@ -34,8 +42,17 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     private LineMusicFragment mLineMusicFragment;
     private ViewPager mViewPager;
 
-    private FrameLayout mFlPlayBar;//音乐播放控制条
+    //音乐播放控制条
+    private FrameLayout mFlPlayBar;
+    private ImageView mIvCover;
+    private TextView mTvTitle;
+    private TextView mTvArtist;
+    private ImageView mIvPlay;
+    private ImageView mIvPlaylist;
+    private ProgressBar mProgressBar;
     private boolean isShowPlayFragment;//用于判断是否展示了播放页面
+
+    private ControlPanel mControlPanel;
 
 
     @Override
@@ -45,6 +62,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+        super.initView(savedInstanceState);
         mNavigationView = findViewById(R.id.navigation_view);
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
@@ -56,6 +74,13 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         mViewPager = findViewById(R.id.viewpager);
 
         mFlPlayBar = findViewById(R.id.fl_play_bar);
+
+        mProgressBar = findViewById(R.id.pb_play_bar);
+        mIvPlaylist = findViewById(R.id.iv_playlist);
+        mIvPlay = findViewById(R.id.iv_play);
+        mIvCover = findViewById(R.id.iv_cover);
+        mTvArtist = findViewById(R.id.tv_artist);
+        mTvTitle = findViewById(R.id.tv_title);
 
         setView();
     }
@@ -84,8 +109,13 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     }
 
     @Override
-    protected void initData(Intent intent, Bundle savedInstanceState) {
+    protected void onServiceBound() {
+        mControlPanel = new ControlPanel(this, mFlPlayBar);
+        AudioPlayer.getInstance().addOnPlayEventListener(mControlPanel);
+    }
 
+    @Override
+    protected void initData(Intent intent, Bundle savedInstanceState) {
     }
 
     @Override
@@ -98,6 +128,7 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
         mViewPager.addOnPageChangeListener(this);
 
         mFlPlayBar.setOnClickListener(this);
+
 
     }
 
@@ -167,4 +198,45 @@ public class MainActivity extends BaseActivity implements ViewPager.OnPageChange
     public void onPageScrollStateChanged(int state) {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        AudioPlayer.getInstance().removeOnPlayEventListener(mControlPanel);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onChangeMusic(Music music) {
+        if (music == null) {
+            return;
+        }
+//        Bitmap cover = CoverLoader.get().loadThumb(music);
+//        ivPlayBarCover.setImageBitmap(cover);
+        mTvTitle.setText(music.getTitle());
+        mTvArtist.setText(music.getArtist());
+        mIvPlay.setSelected(AudioPlayer.getInstance().isPlaying() || AudioPlayer.getInstance().isPreparing());
+        mProgressBar.setMax((int) music.getDuration());
+        mProgressBar.setProgress((int) AudioPlayer.getInstance().getAudioPosition());
+    }
+
+    @Override
+    public void onPlayerStart() {
+        mIvPlay.setSelected(true);
+    }
+
+    @Override
+    public void onPlayerPause() {
+        mIvPlay.setSelected(false);
+    }
+
+    @Override
+    public void onPublish(int progress) {
+        mProgressBar.setProgress(progress);
+    }
+
+    @Override
+    public void onBufferingUpdate(int percent) {
+
+    }
+
 }

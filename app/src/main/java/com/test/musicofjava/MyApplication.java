@@ -13,5 +13,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+
+        AppCache.getInstance().init(this);
+
     }
 }
