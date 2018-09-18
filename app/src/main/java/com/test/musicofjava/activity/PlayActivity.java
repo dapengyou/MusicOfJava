@@ -9,6 +9,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.test.baselibrary.Utils.DateUtils;
+import com.test.baselibrary.Utils.StatusBarUtil;
 import com.test.baselibrary.base.BaseActivity;
 import com.test.baselibrary.bean.Music;
 import com.test.musicofjava.MyBaseActivity;
@@ -73,6 +74,9 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
 
         mTvTitle = findViewById(R.id.tv_title);
         mTvArtist = findViewById(R.id.tv_artist);
+
+        //沉浸式状态栏
+        StatusBarUtil.setTranslucent(this,159);
 
     }
 
