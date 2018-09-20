@@ -2,7 +2,9 @@ package com.test.musicofjava.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -20,7 +22,11 @@ import com.test.musicofjava.fragment.AlbumFragment;
 import com.test.musicofjava.fragment.LrcViewFragment;
 import com.test.musicofjava.service.AudioPlayer;
 import com.test.musicofjava.service.OnPlayerEventListener;
+import com.test.musicofjava.utils.FileUtils;
 import com.test.musicofjava.widget.AlbumCoverView;
+import com.test.musicofjava.widget.LyricView;
+
+import java.io.File;
 
 public class PlayActivity extends MyBaseActivity implements OnPlayerEventListener {
     private ImageView mIvBack;
@@ -44,6 +50,7 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
     private boolean isShowLrc = false;
     private AlbumCoverView mAlbumCoverView;
     private boolean isPlay = false;//是否播放
+    private LyricView mLyricView;
 
 
     @Override
@@ -71,12 +78,13 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         mFrontAlbum = findViewById(R.id.ll_front_album);
         mBackLrc = findViewById(R.id.ll_back_lrc);
         mAlbumCoverView = findViewById(R.id.albumCoverView);
+        mLyricView = findViewById(R.id.lyric_view);
 
         mTvTitle = findViewById(R.id.tv_title);
         mTvArtist = findViewById(R.id.tv_artist);
 
         //沉浸式状态栏
-        StatusBarUtil.setTranslucent(this,159);
+        StatusBarUtil.setTranslucent(this, 159);
 
     }
 
@@ -84,9 +92,19 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
     protected void initData(Intent intent, Bundle savedInstanceState) {
         initPlayMode();
         flipCard();
+        initLyric();
 
         onChangeImpl(AudioPlayer.getInstance().getPlayMusic());
         AudioPlayer.getInstance().addOnPlayEventListener(this);
+    }
+
+    private void initLyric() {
+        mLyricView.setLineSpace(8.0f);
+        mLyricView.setTextSize(10.0f);
+        mLyricView.setCurrentTextSize(15.0f);
+        mLyricView.setPlayable(false);
+        mLyricView.setTouchable(false);
+        mLyricView.setClickable(false);
     }
 
     private void onChangeImpl(Music music) {
@@ -103,7 +121,7 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         mTvCurrentTime.setText("00:00");
         mTvTotalTime.setText(DateUtils.format("mm:ss", music.getDuration()));
 //        setCoverAndBg(music);
-//        setLrc(music);
+        setLrc(music);
         if (AudioPlayer.getInstance().isPlaying() || AudioPlayer.getInstance().isPreparing()) {
             mIvPlay.setSelected(true);
             mAlbumCoverView.start();
@@ -149,6 +167,70 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
 
 
         }
+    }
+
+    private void setLrc(final Music music) {
+        //本地音乐
+        if (music.getType() == Music.Type.LOCAL) {
+            String lrcPath = FileUtils.getLrcFilePath(music);
+            if (!TextUtils.isEmpty(lrcPath)) {
+                loadLrc(lrcPath);
+            } else {
+                show("正在搜索歌词");
+//                new SearchLrc(music.getArtist(), music.getTitle()) {
+//                    @Override
+//                    public void onPrepare() {
+//                        // 设置tag防止歌词下载完成后已切换歌曲
+//                        vpPlay.setTag(music);
+//
+//                        loadLrc("");
+//                        setLrcLabel("正在搜索歌词");
+//                    }
+//
+//                    @Override
+//                    public void onExecuteSuccess(@NonNull String lrcPath) {
+//                        if (vpPlay.getTag() != music) {
+//                            return;
+//                        }
+//
+//                        // 清除tag
+//                        vpPlay.setTag(null);
+//
+//                        loadLrc(lrcPath);
+//                        setLrcLabel("暂无歌词");
+//                    }
+//
+//                    @Override
+//                    public void onExecuteFail(Exception e) {
+//                        if (vpPlay.getTag() != music) {
+//                            return;
+//                        }
+//
+//                        // 清除tag
+//                        vpPlay.setTag(null);
+//
+//                        setLrcLabel("暂无歌词");
+//                    }
+//                }.execute();
+            }
+        } else {
+            //线上音乐
+            String lrcPath = FileUtils.getLrcDir() + FileUtils.getLrcFileName(music.getArtist(), music.getTitle());
+            loadLrc(lrcPath);
+        }
+    }
+
+    private void loadLrc(String path) {
+        if (TextUtils.isEmpty(path)) {
+            mLyricView.reset("暂无歌词");
+        } else {
+            File file = new File(path);
+            mLyricView.setLyricFile(file, "UTF-8");
+        }
+    }
+
+    private void setLrcLabel(String label) {
+//        mLyricView.setLabel(label);
     }
 
     //切换歌词与封面
