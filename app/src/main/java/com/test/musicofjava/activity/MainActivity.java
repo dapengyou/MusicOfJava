@@ -25,8 +25,10 @@ import com.test.musicofjava.fragment.LineMusicFragment;
 import com.test.musicofjava.fragment.LocalMusicFragment;
 import com.test.musicofjava.service.AudioPlayer;
 import com.test.musicofjava.service.OnPlayerEventListener;
+import com.test.musicofjava.service.QuitTimer;
 
-public class MainActivity extends MyBaseActivity implements ViewPager.OnPageChangeListener, OnPlayerEventListener {
+public class MainActivity extends MyBaseActivity implements ViewPager.OnPageChangeListener, OnPlayerEventListener,
+        QuitTimer.OnTimerListener {
     private ImageView mIvSeach;//搜索
     private ImageView mIvMenu;//抽屉菜单
     private TextView mTvLocalMusic;//本地音乐
@@ -112,6 +114,7 @@ public class MainActivity extends MyBaseActivity implements ViewPager.OnPageChan
     protected void onServiceBound() {
         mControlPanel = new ControlPanel(this, mFlPlayBar);
         AudioPlayer.getInstance().addOnPlayEventListener(mControlPanel);
+        QuitTimer.getInstance().init(this);
     }
 
     @Override
@@ -202,6 +205,7 @@ public class MainActivity extends MyBaseActivity implements ViewPager.OnPageChan
     @Override
     protected void onDestroy() {
         AudioPlayer.getInstance().removeOnPlayEventListener(mControlPanel);
+        QuitTimer.getInstance().setOnTimerListener(null);
         super.onDestroy();
     }
 
@@ -237,6 +241,15 @@ public class MainActivity extends MyBaseActivity implements ViewPager.OnPageChan
     @Override
     public void onBufferingUpdate(int percent) {
 
+    }
+
+    @Override
+    public void onTimer(long remain) {
+//        if (timerItem == null) {
+//            timerItem = navigationView.getMenu().findItem(R.id.action_timer);
+//        }
+//        String title = getString(R.string.menu_timer);
+//        timerItem.setTitle(remain == 0 ? title : SystemUtils.formatTime(title + "(mm:ss)", remain))
     }
 
 }

@@ -1,6 +1,7 @@
 package com.test.musicofjava.activity;
 
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
@@ -28,7 +29,7 @@ import com.test.musicofjava.widget.LyricView;
 
 import java.io.File;
 
-public class PlayActivity extends MyBaseActivity implements OnPlayerEventListener {
+public class PlayActivity extends MyBaseActivity implements OnPlayerEventListener, SeekBar.OnSeekBarChangeListener {
     private ImageView mIvBack;
     private ImageView mIvNext, mIvPlay, mIvPrev, mIvMode;
 
@@ -40,6 +41,7 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
 
     private SeekBar mSeekBar;
     private int mLastProgress;
+    private boolean isDraggingProgress;//是否拖动进度条
 
 
     private View mFrontAlbum;//专辑封面
@@ -102,9 +104,9 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         mLyricView.setLineSpace(8.0f);
         mLyricView.setTextSize(10.0f);
         mLyricView.setCurrentTextSize(15.0f);
-        mLyricView.setPlayable(false);
-        mLyricView.setTouchable(false);
-        mLyricView.setClickable(false);
+        mLyricView.setPlayable(true);
+        mLyricView.setTouchable(true);
+        mLyricView.setClickable(true);
     }
 
     private void onChangeImpl(Music music) {
@@ -140,6 +142,8 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         mIvBack.setOnClickListener(this);
 
         mFrameLayout.setOnClickListener(this);
+        mSeekBar.setOnSeekBarChangeListener(this);
+
     }
 
     @Override
@@ -220,6 +224,11 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         }
     }
 
+    /**
+     * 加载歌词
+     *
+     * @param path
+     */
     private void loadLrc(String path) {
         if (TextUtils.isEmpty(path)) {
             mLyricView.reset("暂无歌词");
@@ -229,9 +238,6 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         }
     }
 
-    private void setLrcLabel(String label) {
-//        mLyricView.setLabel(label);
-    }
 
     //切换歌词与封面
     private void flipCard() {
@@ -303,12 +309,56 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
 
     @Override
     public void onPublish(int progress) {
-        mSeekBar.setProgress(progress);
+        if (!isDraggingProgress) {
+            mSeekBar.setProgress(progress);
+        }
+        mLyricView.setCurrentTimeMillis(progress);
+
     }
 
     @Override
     public void onBufferingUpdate(int percent) {
 
+    }
+
+    //seekBar 监听实现的方法
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (seekBar == mSeekBar) {
+            if (Math.abs(progress - mLastProgress) >= android.text.format.DateUtils.SECOND_IN_MILLIS) {
+                mTvCurrentTime.setText(DateUtils.format("mm:ss", progress));
+                mLastProgress = progress;
+            }
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        if (seekBar == mSeekBar) {
+            isDraggingProgress = true;
+        }
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        if (seekBar == mSeekBar) {
+            isDraggingProgress = false;
+            if (AudioPlayer.getInstance().isPlaying() || AudioPlayer.getInstance().isPausing()) {
+                int progress = seekBar.getProgress();
+                AudioPlayer.getInstance().seekTo(progress);
+
+//                if (mLrcViewSingle.hasLrc()) {
+//                    mLrcViewSingle.updateTime(progress);
+//                    mLrcViewFull.updateTime(progress);
+//                }
+            } else {
+                seekBar.setProgress(0);
+            }
+        }
+//        else if (seekBar == sbVolume) {
+//            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(),
+//                    AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+//        }
     }
 
 }

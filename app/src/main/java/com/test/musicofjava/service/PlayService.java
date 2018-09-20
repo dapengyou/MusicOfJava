@@ -30,6 +30,7 @@ public class PlayService extends Service {
         Log.i(TAG, "onCreate: " + getClass().getSimpleName());
         AudioPlayer.getInstance().init(this);
         MediaSessionManager.getInstance().init(this);
+        QuitTimer.getInstance().init(this);
     }
 
     @Nullable
@@ -58,5 +59,6 @@ public class PlayService extends Service {
 
     private void stop() {
         AudioPlayer.getInstance().stopPlayer();
+        QuitTimer.getInstance().stop();
     }
 }
