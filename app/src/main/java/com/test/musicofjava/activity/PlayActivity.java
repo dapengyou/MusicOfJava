@@ -1,10 +1,7 @@
 package com.test.musicofjava.activity;
 
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,7 +10,6 @@ import android.widget.TextView;
 
 import com.test.baselibrary.Utils.DateUtils;
 import com.test.baselibrary.Utils.StatusBarUtil;
-import com.test.baselibrary.base.BaseActivity;
 import com.test.baselibrary.bean.Music;
 import com.test.musicofjava.MyBaseActivity;
 import com.test.musicofjava.R;
@@ -96,7 +92,7 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         flipCard();
         initLyric();
 
-        onChangeImpl(AudioPlayer.getInstance().getPlayMusic());
+        initMusic(AudioPlayer.getInstance().getPlayMusic());
         AudioPlayer.getInstance().addOnPlayEventListener(this);
     }
 
@@ -109,7 +105,7 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         mLyricView.setClickable(true);
     }
 
-    private void onChangeImpl(Music music) {
+    private void initMusic(Music music) {
         if (music == null) {
             return;
         }
@@ -124,6 +120,7 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         mTvTotalTime.setText(DateUtils.format("mm:ss", music.getDuration()));
 //        setCoverAndBg(music);
         setLrc(music);
+        //是否正在播放，或是正在准备
         if (AudioPlayer.getInstance().isPlaying() || AudioPlayer.getInstance().isPreparing()) {
             mIvPlay.setSelected(true);
             mAlbumCoverView.start();
@@ -153,8 +150,10 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
                 AudioPlayer.getInstance().playPause();
                 break;
             case R.id.iv_next:
+                AudioPlayer.getInstance().next();
                 break;
             case R.id.iv_prev:
+                AudioPlayer.getInstance().prev();
                 break;
             case R.id.iv_mode:
                 setPlayMode();
@@ -173,6 +172,11 @@ public class PlayActivity extends MyBaseActivity implements OnPlayerEventListene
         }
     }
 
+    /**
+     * 设置歌词
+     *
+     * @param music
+     */
     private void setLrc(final Music music) {
         //本地音乐
         if (music.getType() == Music.Type.LOCAL) {
