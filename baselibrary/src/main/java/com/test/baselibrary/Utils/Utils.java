@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.WindowManager;
 
 
+import com.test.baselibrary.video.constant.SDKConstant;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
@@ -58,7 +60,13 @@ public class Utils {
         return -1;
     }
 
-    //is wifi connected
+    /**
+     * @param context :
+     * @return : boolean
+     * @date 创建时间: 2018/10/24
+     * @author lady_zhou
+     * @Description WiFi连接
+     */
     public static boolean isWifiConnected(Context context) {
         if (context.checkCallingOrSelfPermission(permission.ACCESS_WIFI_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -73,26 +81,33 @@ public class Utils {
         return false;
     }
 
-    //decide can autoplay the ad
-//    public static boolean canAutoPlay(Context context, AutoPlaySetting setting) {
-//        boolean result = true;
-//        switch (setting) {
-//            case AUTO_PLAY_3G_4G_WIFI:
-//                result = true;
-//                break;
-//            case AUTO_PLAY_ONLY_WIFI:
-//                if (isWifiConnected(context)) {
-//                    result = true;
-//                } else {
-//                    result = false;
-//                }
-//                break;
-//            case AUTO_PLAY_NEVER:
-//                result = false;
-//                break;
-//        }
-//        return result;
-//    }
+    /**
+     * @param context :
+     * @param setting :
+     * @return : boolean
+     * @date 创建时间: 2018/10/24
+     * @author lady_zhou
+     * @Description 自动播放
+     */
+    public static boolean canAutoPlay(Context context, SDKConstant.AutoPlaySetting setting) {
+        boolean result = true;
+        switch (setting) {
+            case AUTO_PLAY_3G_4G_WIFI:
+                result = true;
+                break;
+            case AUTO_PLAY_ONLY_WIFI:
+                if (isWifiConnected(context)) {
+                    result = true;
+                } else {
+                    result = false;
+                }
+                break;
+            case AUTO_PLAY_NEVER:
+                result = false;
+                break;
+        }
+        return result;
+    }
 
     /**
      * 获取对应应用的版本号

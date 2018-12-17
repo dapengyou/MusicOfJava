@@ -12,4 +12,7 @@
     <color name="result_points">#c000ff00</color>
     <color name="system_bar_color">#fed952</color>
     <!-- QRCode scanner color end -->
+
+    <color name="sdk_frame_bg">#e5e5e5</color>
+
 </resources>
